@@ -73,9 +73,68 @@ def tinyMazeSearch(problem):
     return  [s, s, w, s, w, w, s, w]
 
 def depthFirstSearch(problem):
+    corners = 0
+    explored = []
+    exploredState = []
+    frontier = []
+    actions = []
+    start = problem.getStartState()
+    frontier = frontier + [start]
+    currentState = 0
+    aux = []
+
+    while True:
+        if len(frontier) == 0:
+            return "failure"
+        newState = frontier.pop(0)
+        if (currentState != 0):
+            actions = [newState.action] + actions
+        if problem.isGoalState(newState):
+            for a in actions:
+                aux = [a] + aux
+            return aux
+        i = 0
+        while True and currentState != 0:
+            currentState = explored[i]
+            if newState.position in currentState.successors:
+                break
+            if exploredState[i] == True:
+                actions.pop(0)
+                exploredState[i] = False
+            i = i+1
+        currentState = newState
+        successors = problem.getSuccessors(currentState)
+        for successor in successors:
+            explore = True
+            for p in frontier:
+                if successor[0].position == p.position:
+                    explore = False
+            if explore == True:
+                for q in explored:
+                    if successor[0].position == q.position:
+                        explore = False
+            if explore == True:
+                currentState.addSuccessorPosition([successor[0].position])
+                successor[0].setAction(successor[1])
+                frontier = [successor[0]] + frontier
+        if problem.getCornerCount() != corners:
+            for i in range(len(explored)):
+                if exploredState[i] == True and explored[i].action != 0:
+                    actions = [explored[i].action] + actions
+            print(actions)
+            return actions
+            corners = problem.getCornerCount()
+            explored = []
+            exploredState = []
+            frontier = [currentState]
+            currentState = 0
+            continue
+        explored = [currentState] + explored
+        exploredState = [True] + exploredState
+
+
     """
     Search the deepest nodes in the search tree first.
-
     Your search algorithm needs to return a list of actions that reaches the
     goal. Make sure to implement a graph search algorithm.
 
@@ -86,8 +145,6 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
