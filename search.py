@@ -88,6 +88,7 @@ def depthFirstSearch(problem):
         currentState = frontier.pop(0)
 
         if problem.isGoalState(currentState):
+            print("D")
             return currentState.actions
 
         if (problem.cornerCount > corners):
@@ -130,9 +131,46 @@ def depthFirstSearch(problem):
     """
 
 def breadthFirstSearch(problem):
-    """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    corners = 0
+    explored = []
+    frontier = []
+    path = []
+    start = problem.getStartState()
+    frontier = frontier + [start]
+
+    while True:
+        if len(frontier) == 0:
+            return []
+
+
+        currentState = frontier.pop(0)
+
+        if problem.isGoalState(currentState):
+            return currentState.actions
+
+        if (problem.cornerCount > corners):
+            currentState = frontier.pop()
+            corners = corners + 1
+            frontier = []
+            explored = []
+
+        explored = explored + [currentState]
+        
+
+        
+        successors = problem.getSuccessors(currentState)
+        for successor in successors:
+            explore = True
+            for frontierNode in frontier:
+                if successor[0].position == frontierNode.position:
+                    explore = False
+            if explore == True:
+                for q in explored:
+                    if successor[0].position == q.position:
+                        explore = False
+            if explore == True:
+                successor[0].actions = currentState.actions + [successor[1]]
+                frontier = frontier + [successor[0]]
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
