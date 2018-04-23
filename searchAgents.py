@@ -270,14 +270,7 @@ class StateCorners:
 
     def __init__(self, xyPosition):
         self.position = xyPosition
-        self.successors = []
-        self.action = 0
-
-    def addSuccessorPosition(self, newSuccessorPosition):
-        self.successors = self.successors + newSuccessorPosition
-
-    def setAction(self, newAction):
-        self.action = newAction
+        self.actions = []
 
 class CornersProblem(search.SearchProblem):
     """
@@ -308,6 +301,8 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         startState = StateCorners(self.startingPosition)
+
+        startState.actions = []
         return startState
         
     def getCornerCount(self):
@@ -332,7 +327,6 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
-        print(self.cornerCount)
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             x,y = state.position

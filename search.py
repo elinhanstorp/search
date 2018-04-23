@@ -75,62 +75,45 @@ def tinyMazeSearch(problem):
 def depthFirstSearch(problem):
     corners = 0
     explored = []
-    exploredState = []
     frontier = []
-    actions = []
+    path = []
     start = problem.getStartState()
     frontier = frontier + [start]
-    currentState = 0
-    aux = []
 
     while True:
         if len(frontier) == 0:
-            return "failure"
-        newState = frontier.pop(0)
-        if (currentState != 0):
-            actions = [newState.action] + actions
-        if problem.isGoalState(newState):
-            for a in actions:
-                aux = [a] + aux
-            return aux
-        i = 0
-        while True and currentState != 0:
-            currentState = explored[i]
-            if newState.position in currentState.successors:
-                break
-            if exploredState[i] == True:
-                actions.pop(0)
-                exploredState[i] = False
-            i = i+1
-        currentState = newState
+            return []
+
+
+        currentState = frontier.pop(0)
+
+        if problem.isGoalState(currentState):
+            return currentState.actions
+
+        if (problem.cornerCount > corners):
+            corners = corners + 1
+            frontier = []
+            explored = []
+            print currentState.position
+
+        explored = explored + [currentState]
+        
+
+        
         successors = problem.getSuccessors(currentState)
         for successor in successors:
             explore = True
-            for p in frontier:
-                if successor[0].position == p.position:
+            for frontierNode in frontier:
+                if successor[0].position == frontierNode.position:
                     explore = False
             if explore == True:
                 for q in explored:
                     if successor[0].position == q.position:
                         explore = False
             if explore == True:
-                currentState.addSuccessorPosition([successor[0].position])
-                successor[0].setAction(successor[1])
+                successor[0].actions = currentState.actions + [successor[1]]
                 frontier = [successor[0]] + frontier
-        if problem.getCornerCount() != corners:
-            for i in range(len(explored)):
-                if exploredState[i] == True and explored[i].action != 0:
-                    actions = [explored[i].action] + actions
-            print(actions)
-            return actions
-            corners = problem.getCornerCount()
-            explored = []
-            exploredState = []
-            frontier = [currentState]
-            currentState = 0
-            continue
-        explored = [currentState] + explored
-        exploredState = [True] + exploredState
+                
 
 
     """
