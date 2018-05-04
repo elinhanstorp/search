@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -284,7 +284,7 @@ class CornersProblem(search.SearchProblem):
         Stores the walls, pacman's starting position and corners.
         """
         self.walls = startingGameState.getWalls()
-        print (self.walls)
+        #print (self.walls)
         self.startingPosition = startingGameState.getPacmanPosition()
         top, right = self.walls.height-2, self.walls.width-2
         self.corners = ((1,1), (1,top), (right, 1), (right, top))
@@ -304,7 +304,7 @@ class CornersProblem(search.SearchProblem):
 
         startState.actions = []
         return startState
-        
+
     def getCornerCount(self):
         return self.cornerCount
 
@@ -342,7 +342,6 @@ class CornersProblem(search.SearchProblem):
                 successors = successors + [(successor, action, 1)]
         self._expanded += 1 # DO NOT CHANGE
         return successors
-
 
     def getCostOfActions(self, actions):
         """
