@@ -316,6 +316,13 @@ class CornersProblem(search.SearchProblem):
             return True
         return False
 
+    def isGoalStateIterative(self, state):
+        """
+        Returns whether this search state is a goal state of the problem.
+        """
+        if self.cornerCount == 4 and state == self.startingPosition:
+            return True
+        return False
 
     def getSuccessors(self, state):
         """
@@ -330,6 +337,26 @@ class CornersProblem(search.SearchProblem):
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             x,y = state.position
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            if not hitsWall:
+                position = (nextx, nexty)
+                successor = StateCorners(position)
+                if position in self.corners and position not in self.exploredCorners:
+                    self.cornerCount = self.cornerCount + 1
+                    self.exploredCorners = self.exploredCorners + [position]
+                successors = successors + [(successor, action, 1)]
+        self._expanded += 1 # DO NOT CHANGE
+        return successors
+
+
+
+    def getSuccessorActions(self, state):   #for iterativeDLS
+
+        successors = []
+        for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
+            x,y = state
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             hitsWall = self.walls[nextx][nexty]
@@ -417,6 +444,7 @@ class FoodSearchProblem:
                 nextFood[nextx][nexty] = False
                 successors.append( ( ((nextx, nexty), nextFood), direction, 1) )
         return successors
+
 
     def getCostOfActions(self, actions):
         """Returns the cost of a particular sequence of actions.  If those actions

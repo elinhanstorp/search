@@ -18,6 +18,7 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
+import math
 
 class SearchProblem:
     """
@@ -92,7 +93,7 @@ def depthFirstSearch(problem):
             corners = corners + 1
             frontier = []
             explored = []
-            print currentState.position
+            #print currentState.position
 
         explored = explored + [currentState]
 
@@ -161,6 +162,18 @@ def nullHeuristic(state, problem=None):
     "*** DO NOT IMPLEMENT ***"
     return 0
 
+def cornersHeuristic(state, problem=None):
+    h=99999
+    x,y = state.position
+    #for corner in problem.corners
+    for c in problem.corners:
+        dx,dy = c
+        h_new = math.pow((x-dx),2) + math.pow((y-dy),2)
+        h_new = math.sqrt(h_new)
+        if (h_new < h):
+            h = h_new
+    return h
+
 def aStarSearch(problem, heuristic=nullHeuristic):
     corners = 0
     explored = []
@@ -186,8 +199,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
         for successor in successors:
             new_Path = path + [successor[1]] #creates a list with the actions.
-            new_cost = problem.getCostOfActions(new_Path) + nullHeuristic(successor, problem) # g+h but h is only 0.
-
+            new_cost = problem.getCostOfActions(new_Path) + cornersHeuristic(successor[0], problem) # g+h but h is only 0, same as nullHeuristic
             explore = True
 
             for q in explored:
@@ -217,9 +229,11 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     return []   #when jumping out of while-loop.
 
 
+
 # Abbreviations
 bfs = breadthFirstSearch
 dfs = depthFirstSearch
 astar = aStarSearch
 ucs = uniformCostSearch
 astar = aStarSearch
+#ids = iDeepeningSearch
