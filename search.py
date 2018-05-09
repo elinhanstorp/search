@@ -228,7 +228,70 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                     break
     return []   #when jumping out of while-loop.
 
+class Node(object):
+    def __init__(self, state=None):
+        self.state=state
+        self.solution=[]
 
+def childNode(parent, action):
+    theState = action[0].position  ## coordinates (5,1)
+    path = action[1]            ##North, south ..
+
+    child = Node()
+    child.state = theState
+    child.solution = list(parent.solution)
+    child.solution.append(path)
+
+    return child
+
+def recursiveDLS(node, problem, limit, explored, foundCorner):
+
+    if problem.isGoalStateIterative(node.state) and len(foundCorner) == 4:
+        return node.solution
+
+    elif limit == 0:
+        return "cutoff"
+    else:
+        cutoff_occured = False
+        explored.add(node.state)
+        actions = problem.getSuccessorActions(node.state)
+        for action in actions:
+            child = childNode(node ,action)
+            if (problem.cornerCount > len(foundCorner)) and (child.state in problem.corners) and (child.state not in foundCorner):
+                explored = set()
+                foundCorner = foundCorner + [child.state]
+
+            if not(child.state in explored):
+                result = recursiveDLS(child,problem,limit-1,explored, foundCorner)
+                if result == "cutoff":
+                    cutoff_occured = True
+                elif result != "failure":
+                    return result
+        if cutoff_occured:
+            return "cutoff"
+        else:
+            return "failure"
+
+def depthLimitedSearch(problem, limit):
+    start = problem.getStartState()
+    startnode = Node(state=start.position)
+    explored = set()
+    foundCorner=[]
+    return recursiveDLS(startnode,problem,limit,explored, foundCorner)
+
+def iDeepeningSearch(problem):
+    """ Iterative deepening search.
+    Iterative DFS to achieve a result similar to breadthFirstSearch without taking up as much space. """
+    depth = 0
+    while True:
+        result = depthLimitedSearch(problem, depth)
+        if result != "cutoff":
+            if result == "failure":
+                print(" ............The test failed............")
+                return []
+            print("Depth reached:", depth)
+            return result
+        depth = depth + 1
 
 # Abbreviations
 bfs = breadthFirstSearch
@@ -236,4 +299,4 @@ dfs = depthFirstSearch
 astar = aStarSearch
 ucs = uniformCostSearch
 astar = aStarSearch
-#ids = iDeepeningSearch
+ids = iDeepeningSearch
