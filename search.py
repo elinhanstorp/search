@@ -79,6 +79,8 @@ def depthFirstSearch(problem):
     frontier = []
     start = problem.getStartState()
     frontier = frontier + [start]
+    memory_explored=0
+    memory_frontier=0
 
     while True:
         if len(frontier) == 0:
@@ -86,7 +88,15 @@ def depthFirstSearch(problem):
 
         currentState = frontier.pop(0)
 
+        #checking memory use:
+        if (memory_explored < len(explored) ):
+            memory_explored = len(explored)
+        if (memory_frontier < len(frontier) ):
+            memory_frontier = len(frontier)
+
         if problem.isGoalState(currentState):
+            sum= memory_explored + memory_frontier
+            print("maximum memory use: ", sum)
             return currentState.actions
 
         if (problem.cornerCount > corners):
@@ -117,6 +127,8 @@ def breadthFirstSearch(problem):
     frontier = []
     start = problem.getStartState()
     frontier = frontier + [start]
+    memory_explored=0
+    memory_frontier=0
 
     while True:
         if len(frontier) == 0:
@@ -124,7 +136,15 @@ def breadthFirstSearch(problem):
 
         currentState = frontier.pop(0)
 
+        #checking memory use:
+        if (memory_explored < len(explored) ):
+            memory_explored = len(explored)
+        if (memory_frontier < len(frontier) ):
+            memory_frontier = len(frontier)
+
         if problem.isGoalState(currentState):
+            sum = memory_explored + memory_frontier
+            print("maximum memory use: ", sum)
             return currentState.actions
 
         if (problem.cornerCount > corners):
@@ -180,6 +200,10 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     frontier = dict()
     start = problem.getStartState()
     frontier[start]=([],0)  #(path,cost) no path in first state
+    memory_explored=0
+    memory_frontier=0
+    memory_sortedfrontier=0
+
 
     while not len(frontier)==0:
         orderedStates=sorted(frontier, key=lambda i: frontier[i][1]) #orderstates is only the nodes in a list ordered by it's paths.
@@ -189,7 +213,17 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         path = temp[0]
         cost = temp[1]
 
+        #checking memory use:
+        if (memory_explored < len(explored) ):
+            memory_explored = len(explored)
+        if (memory_frontier < len(frontier) ):
+            memory_frontier = len(frontier)
+        if (memory_sortedfrontier < len(orderedStates)):
+            memory_explored = len(orderedStates)
+
         if problem.isGoalState(currentState):
+                sum= memory_explored + memory_frontier + memory_sortedfrontier
+                print("maximum memory use: ", sum)
                 return path
 
         del frontier[currentState]   #make it work as pop.
@@ -244,9 +278,15 @@ def childNode(parent, action):
 
     return child
 
-def recursiveDLS(node, problem, limit, explored, foundCorner):
+def recursiveDLS(node, problem, limit, explored, foundCorner, memory_use):
+
+    #checking memory usage
+    #print(memory_use, "<", len(node.solution) + len(explored), (memory_use < len(node.solution) + len(explored))
+    if(memory_use < len(node.solution) + len(explored)):
+        memory_use = len(node.solution) + len(explored)
 
     if problem.isGoalStateIterative(node.state) and len(foundCorner) == 4:
+        print("maximum memory use: ", memory_use)
         return node.solution
 
     elif limit == 0:
@@ -262,7 +302,7 @@ def recursiveDLS(node, problem, limit, explored, foundCorner):
                 foundCorner = foundCorner + [child.state]
 
             if not(child.state in explored):
-                result = recursiveDLS(child,problem,limit-1,explored, foundCorner)
+                result = recursiveDLS(child,problem,limit-1,explored, foundCorner, memory_use)
                 if result == "cutoff":
                     cutoff_occured = True
                 elif result != "failure":
@@ -277,7 +317,8 @@ def depthLimitedSearch(problem, limit):
     startnode = Node(state=start.position)
     explored = set()
     foundCorner=[]
-    return recursiveDLS(startnode,problem,limit,explored, foundCorner)
+    memory_use = 0
+    return recursiveDLS(startnode,problem,limit,explored, foundCorner, memory_use)
 
 def iDeepeningSearch(problem):
     """ Iterative deepening search.
