@@ -295,6 +295,8 @@ class CornersProblem(search.SearchProblem):
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
         self.cornerCount = 0
 
+        self.goal = ( startingGameState.getPacmanPosition(),[])
+
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
@@ -497,6 +499,65 @@ def foodHeuristic(state, problem):
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
     return 0
+############################################################################################################################
+
+class CornersGreedySearchAgent(SearchAgent):
+
+    "Search for all food using a sequence of searches"
+    def registerInitialState(self, state):
+        self.actions = []
+        currentState = state
+        while(currentState.getFood().count() > 0):
+            nextPathSegment = self.findPathToClosestDot(currentState) # The missing piece
+            self.actions += nextPathSegment
+            for action in nextPathSegment:
+                legal = currentState.getLegalActions()
+                if action not in legal:
+                    t = (str(action), str(currentState))
+                    raise Exception, 'findPathToClosestDot returned an illegal move: %s!\n%s' % t
+                currentState = currentState.generateSuccessor(0, action)
+        self.actionIndex = 0
+        print 'Path found with cost %d.' % len(self.actions)
+
+        #mismo codigo que abajo
+
+    def findPathToClosestDot(self, gameState):
+        "Returns a path (a list of actions) to the closest dot, starting from gameState"
+        # Here are some useful elements of the startState
+        startPosition = gameState.getPacmanPosition()
+        food = gameState.getFood()
+        walls = gameState.getWalls()
+        problem = AnyFoodSearchProblem(gameState)
+
+        # Con una idea de busqueda en amplitud
+
+        frontera = util.Queue()
+
+        action_list = []    # Lista de acciones tomadas
+        visitados = []        # Lista de los nodos visitados
+        inicio = problem.getStartState()   # estado del problema incial
+        total_cost = 0      # Costo para llegar al nodo actual
+
+        frontera.push((inicio, action_list))
+
+        while frontera:
+
+            node, actions = frontera.pop()
+
+            if not node in visitados:
+                visitados.append(node)
+
+                if problem.isGoalState(node):
+                    return actions
+
+                successors = problem.getSuccessors(node)
+
+                for successor in successors:
+                    coordinate, direction, cost = successor
+                    frontera.push((coordinate, actions + [direction]))
+
+
+############################################################################################################################
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -561,9 +622,8 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         complete the problem definition.
         """
         x,y = state
-
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        foodPositions = self.food.asList()
+        return (x, y) in foodPositions
 
 def mazeDistance(point1, point2, gameState):
     """

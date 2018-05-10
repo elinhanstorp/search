@@ -334,6 +334,60 @@ def iDeepeningSearch(problem):
             return result
         depth = depth + 1
 
+
+def bidirectional_search(problem):
+
+    frontIni = util.Queue()
+    frontGoal = util.Queue()
+
+    explo1 = list()
+    explo2 = list()
+
+    frontIni.push((problem.getStartState(), list()))
+    frontGoal.push((problem.goal, list()))
+
+    goal2 = problem.getStartState()
+
+    #se aplciara bfs a ambas fronteras y cuando tengau un nodo en comun es porque
+    #se encontro un camino.
+
+    while not frontIni.isEmpty():
+        nodo1 = frontIni.pop()
+        nodo2 = frontGoal.pop()
+
+        for data in problem.getSuccessors(nodo1[0]):
+
+            if not data[0] in explo1:
+                if problem.isGoalState(data[0]):
+                    return nodo1[1] + [data[1]]
+
+                frontIni.push((data[0], nodo1[1] + [data[1]]))
+                explo1.append(data[0])
+
+        for data in problem.getSuccessors(nodo2[0]):
+            if not data[0] in explo2:
+                if data[0] == goal2:
+                    return [data[1]] + nodo2[1][::-1]
+                frontGoal.push((data[0], nodo2[1] + [data[1]]))
+                explo2.append(data[0])
+
+        #verificacion si las fronteras tienen un estado comun
+        for node in frontIni.list:
+            for elem in frontGoal.list:
+                if node[0] == elem[0]:
+                    act1 = node[1]
+                    act2 = elem[1]
+                    act2 = act2[::-1]#inversion de la lista de acciones act2
+
+                    for i in range(len(act2)):#reemplazamos los valores
+                        if act2[i] == "North": act2[i] = "South"
+                        elif act2[i] == "South": act2[i] = "North"
+                        elif act2[i] == "West": act2[i] = "East"
+                        elif act2[i] == "East": act2[i] = "West"
+                    return act1 + act2
+    return []
+
+
 # Abbreviations
 bfs = breadthFirstSearch
 dfs = depthFirstSearch
@@ -341,3 +395,4 @@ astar = aStarSearch
 ucs = uniformCostSearch
 astar = aStarSearch
 ids = iDeepeningSearch
+bs  = bidirectional_search
